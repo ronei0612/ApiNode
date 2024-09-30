@@ -19,7 +19,7 @@ app.get('/fetch-url', async (req, res) => {
   }
 });
 
-app.get('/fetch-url', async (req, res) => {
+app.get('/', async (req, res) => {
   res.send('Ok');
 });
 
