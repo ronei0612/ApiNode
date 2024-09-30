@@ -16,6 +16,7 @@ app.get('/fetch-url', async (req, res) => {
     
     // Procurar URLs de imagens na resposta
     const imageUrls = response.data.match(/https:\/\/lh3[^ ]*/i);
+    const imageUrl = match ? match[0].split('">')[0] : null;
     
     if (imageUrls) {
       res.send(imageUrls[0]);
