@@ -15,7 +15,7 @@ app.get('/fetch-url', async (req, res) => {
     const response = await axios.get(url);
     
     // Procurar URLs de imagens na resposta
-    const imageUrls = response.data.match(/https:\/\/[^ ]*\.(?:png|jpg|jpeg|gif|webp)/i);
+    const imageUrls = response.data.match(/https:\/\/lh3[^ ]*/i);
     
     if (imageUrls) {
       res.send(imageUrls[0]);
