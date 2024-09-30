@@ -18,8 +18,8 @@ app.get('/fetch-url', async (req, res) => {
     const match = response.data.match(/https:\/\/lh3[^ ]*/i);
     const imageUrl = match ? match[0].split('">')[0] : null;
     
-    if (imageUrls) {
-      res.send(imageUrls[0]);
+    if (imageUrl) {
+      res.send(imageUrl);
     } else {
       res.status(404).send('No image URL found in the response');
     }
