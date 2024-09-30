@@ -13,7 +13,15 @@ app.get('/fetch-url', async (req, res) => {
 
   try {
     const response = await axios.get(url);
-    res.send(response.data);
+    
+    // Procurar URLs de imagens na resposta
+    const imageUrls = response.data.match(/https:\/\/[^ ]*\.(?:png|jpg|jpeg|gif|webp)/i);
+    
+    if (imageUrls) {
+      res.send(imageUrls[0]);
+    } else {
+      res.status(404).send('No image URL found in the response');
+    }
   } catch (error) {
     res.status(500).send('Error fetching the URL');
   }
