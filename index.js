@@ -19,6 +19,10 @@ app.get('/fetch-url', async (req, res) => {
   }
 });
 
+app.get('/fetch-url', async (req, res) => {
+  res.send('Ok');
+});
+
 app.listen(port, () => {
   console.log(`API listening at http://localhost:${port}`);
 });
