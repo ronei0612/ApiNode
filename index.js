@@ -31,9 +31,10 @@ app.post('/fetch-url', async (req, res) => {
     const response = await axios.get(url);
     
     const match = response.data.match(/https:\/\/lh3[^ ]*/i);
-    const imageUrl = match ? match[0].split('">')[0] : null;
+    let imageUrl = match ? match[0].split('">')[0] : null;
     
     if (imageUrl) {
+      imageUrl = imageUrl.split('=w')[0];
       res.send(imageUrl);
     } else {
       res.status(404).send('No image URL found in the response');
