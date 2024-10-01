@@ -6,19 +6,31 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors());
+app.use(express.json());
 
-app.get('/fetch-url', async (req, res) => {
-  const { url } = req.query;
+app.post('/fetch-url', async (req, res) => {
+  const { url } = req.body;
 
   if (!url) {
     return res.status(400).send('URL is required');
   }
 
   try {
+    if (url.startsWith("https://www.bing.com/images/create/")) {
+      const idMatch = url.match(/thId=([^&]*)/);
+      const id = idMatch ? idMatch[1] : null;
+      
+      if (id) {
+        const convertedUrl = `https://th.bing.com/th/id/${id}?pid=ImgGn`;
+        return res.send(convertedUrl);
+      } else {
+        return res.status(400).send('Invalid URL: No thId found');
+      }
+    }
+
     const response = await axios.get(url);
     
-    // Procurar URLs de imagens na resposta
-    const match = response.data.match(/https:\/\/(lh3|th)[^ ]*/i);
+    const match = response.data.match(/https:\/\/lh3[^ ]*/i);
     const imageUrl = match ? match[0].split('">')[0] : null;
     
     if (imageUrl) {
