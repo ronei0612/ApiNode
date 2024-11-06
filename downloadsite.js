@@ -71,7 +71,7 @@ router.post('/downloadsite', async (req, res) => {
 
     res.json({
       tom: tom,
-      cifraTexto: cifraTexto,
+      message: cifraTexto,
       success: true
     });
 
