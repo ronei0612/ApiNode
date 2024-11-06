@@ -69,7 +69,11 @@ router.post('/downloadsite', async (req, res) => {
 
     const { tom, cifraTexto } = obterCifra(html);
 
-    res.json({ tom, cifraTexto });
+    res.json({
+      tom: tom,
+      cifraTexto: cifraTexto,
+      success: true
+    });
 
   } catch (error) {
     console.error('Erro ao buscar a URL:', error);
