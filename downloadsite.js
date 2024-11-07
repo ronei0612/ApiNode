@@ -24,8 +24,8 @@ const { google } = require('googleapis');
 
 const router = express.Router();
 
-const apiKey = "AIzaSyBWjthtU-mhxX8-YtWh6mLJoiWdLdD9hwE";
-const searchEngineId = "c226ebc5ae2754d20";
+const apiKey = process.env.API_KEY;
+const searchEngineId = process.env.SEARCH_ENGINE_ID;
 
 router.post('/pesquisar', (req, res) => {
   const texto = req.body.texto;
