@@ -91,8 +91,8 @@ function obterCifra(html) {
   }
 
   $('span.tablatura').remove();
-  
-  let cifraTexto = $('pre').text().trim();
+
+  let cifraTexto = $('pre').text().trim().replace(/\n{4,}/g, '\n\n');
   if (cifraTexto === '') {
     return { tom, cifraTexto: 'Cifra não encontrada' };
   }
