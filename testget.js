@@ -6,7 +6,9 @@ const router = express.Router();
 
 const statePath = path.join(__dirname, 'state.json');
 // URL de exportação de texto do seu Google Doc
-const googleDocUrl = 'https://docs.google.com/document/d/1P8jVJAgcI-vHREkB6uAgYyj8OW3PFXDbInC_6_cPoWY/export?format=txt';
+//https://docs.google.com/document/d/
+
+const googleDocUrl = 'https://docs.google.com/document/d/1B7a9DIHBkwVT0ktdPZCFNUKibTUFIVw2Bts0fLhPB3k/export?format=txt';
 
 function getPersistentState() {
     try {
