@@ -1,12 +1,13 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios'); // Vamos usar o axios que você já tem
 const router = express.Router();
 
-const filePath = path.join(__dirname, 'Documento.cs');
 const statePath = path.join(__dirname, 'state.json');
+// URL de exportação de texto do seu Google Doc
+const googleDocUrl = 'https://docs.google.com/document/d/1P8jVJAgcI-vHREkB6uAgYyj8OW3PFXDbInC_6_cPoWY/export?format=txt';
 
-// Função para ler o estado salvo (ou criar um se não existir)
 function getPersistentState() {
     try {
         if (fs.existsSync(statePath)) {
@@ -16,52 +17,43 @@ function getPersistentState() {
     } catch (err) {
         console.error("Erro ao ler state.json:", err);
     }
-    return { lastMtime: 0, fileAlreadySent: false };
 }
 
-// Função para salvar o estado no arquivo
 function savePersistentState(state) {
     try {
         fs.writeFileSync(statePath, JSON.stringify(state), 'utf8');
-    } catch (err) {
-        console.error("Erro ao salvar state.json:", err);
-    }
+    } catch (err) { }
 }
 
-router.get('/testget', (req, res) => {
-    if (!fs.existsSync(filePath)) {
-        return res.status(404).send('OK.');
-    }
+router.get('/testget', async (req, res) => {
+    try {
+        // 1. Busca o conteúdo atual do Google Docs
+        const response = await axios.get(googleDocUrl);
+        const currentContent = response.data;
 
-    // 1. Pega os dados atuais do arquivo Documento.cs
-    const stats = fs.statSync(filePath);
-    const currentMtime = stats.mtimeMs; // Data de modificação em milissegundos
+        // 2. Carrega o estado salvo
+        let state = getPersistentState();
 
-    // 2. Carrega o estado salvo no state.json
-    let state = getPersistentState();
+        // 3. Verifica se o conteúdo mudou desde a última vez
+        const contentChanged = currentContent !== state.lastContent;
 
-    // 3. Lógica de decisão:
-    // Se a data de modificação atual for diferente da salva, significa que o arquivo mudou
-    const fileChanged = currentMtime !== state.lastMtime;
-
-    if (fileChanged || !state.fileAlreadySent) {
-        // Se mudou ou nunca foi enviado, lê e mostra o texto
-        fs.readFile(filePath, 'utf8', (err, data) => {
-            if (err) return res.status(500).send('Erro ao ler arquivo.');
-
-            // Atualiza o estado e salva no arquivo
-            state.lastMtime = currentMtime;
+        if (contentChanged || !state.fileAlreadySent) {
+            // Se mudou ou é a primeira vez, envia o texto
+            state.lastContent = currentContent;
             state.fileAlreadySent = true;
             savePersistentState(state);
 
-            console.log('Arquivo modificado ou novo: Enviando conteúdo.');
+            console.log('Google Doc alterado ou novo. Enviando conteúdo...');
             res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-            res.send(data);
-        });
-    } else {
-        // Se já foi enviado e a data de modificação é a mesma
-        console.log('Arquivo já enviado e sem alterações. Retornando OK.');
-        res.send('OK');
+            res.send(currentContent);
+        } else {
+            // Se o conteúdo for idêntico ao salvo
+            console.log('Sem alterações no Google Doc. Retornando OK.');
+            res.send('OK');
+        }
+    } catch (error) {
+        console.error('Erro ao buscar Google Doc:', error.message);
+        res.status(500).send('OK.');
     }
 });
 
