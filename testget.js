@@ -3,42 +3,39 @@ const fs = require('fs');
 const path = require('path');
 const router = express.Router();
 
-// Caminho para o arquivo que você quer enviar (ex: um arquivo .txt ou .json)
-// Certifique-se de que esse arquivo existe na pasta do projeto!
 const filePath = path.join(__dirname, 'Documento.cs');
 
 let fileSent = false;
 
-// Observa mudanças no arquivo para resetar o status
 if (fs.existsSync(filePath)) {
     fs.watch(filePath, (eventType) => {
         if (eventType === 'change') {
-            console.log('Arquivo alterado! Resetando flag.');
+            console.log('Documento.cs modificado!');
             fileSent = false;
         }
     });
 }
 
 router.get('/testget', (req, res) => {
-    // Verifica se o arquivo físico existe
     if (!fs.existsSync(filePath)) {
-        return res.status(404).send('Arquivo não encontrado.');
+        return res.status(404).send('Arquivo Documento.cs não encontrado.');
     }
 
     if (!fileSent) {
-        // Envia o arquivo pela primeira vez (ou após modificação)
-        res.sendFile(filePath, (err) => {
+        // .download(caminho_no_servidor, nome_do_arquivo_ao_baixar)
+        res.download(filePath, 'Documento.cs', (err) => {
             if (err) {
-                res.status(500).send('Erro ao enviar arquivo.');
+                // Se houver erro e os headers ainda não foram enviados, responde erro
+                if (!res.headersSent) {
+                    res.status(500).send('Erro ao baixar o arquivo.');
+                }
             } else {
                 fileSent = true;
-                console.log('Arquivo enviado.');
+                console.log('Documento.cs baixado com sucesso.');
             }
         });
     } else {
-        // Retorna apenas OK nas requisições seguintes
         res.send('OK');
-        console.log('Arquivo já enviado anteriormente. Retornando OK.');
     }
 });
 
